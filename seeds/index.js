@@ -16,33 +16,25 @@ const sample = (array) => array[Math.floor(Math.random() * array.length)];
 
 const seedDB = async () => {
     await Campground.deleteMany({});
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 200; i++) {
         const random1000 = Math.floor(Math.random() * 1000);
-        const price = Math.random() * 25 + 10;
+        const price = Math.floor(Math.random() * 25 + 10);
         const camp = new Campground({
             title: `${sample(descriptors)} ${sample(places)}`,
             location: `${cities[random1000].city}, ${cities[random1000].state}`,
             images: [
                 {
-                    url: 'https://res.cloudinary.com/djxbuhpf2/image/upload/v1687371328/YelpCamp/gtzbwbgaw1ygaxzzvkgb.png',
-                    filename: 'YelpCamp/gtzbwbgaw1ygaxzzvkgb',
-                },
-                {
-                    url: 'https://res.cloudinary.com/djxbuhpf2/image/upload/v1687371328/YelpCamp/g9jo7sngojg5wumwefa1.jpg',
-                    filename: 'YelpCamp/g9jo7sngojg5wumwefa1',
-                },
-                {
-                    url: 'https://res.cloudinary.com/djxbuhpf2/image/upload/v1687371328/YelpCamp/wrf1fsquzmcazamklm2h.png',
-                    filename: 'YelpCamp/wrf1fsquzmcazamklm2h',
-                },
-                {
-                    url: 'https://res.cloudinary.com/djxbuhpf2/image/upload/v1687371328/YelpCamp/ln0mktrmx9yiu0ra8mzz.png',
-                    filename: 'YelpCamp/ln0mktrmx9yiu0ra8mzz',
+                    url: 'https://res.cloudinary.com/djxbuhpf2/image/upload/v1687396666/YelpCamp/cb2qd5fdxvox1ei1x7wh.jpg',
+                    filename: 'YelpCamp/cb2qd5fdxvox1ei1x7wh',
                 }
             ],
             description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Tempore ipsam repellat expedita eos quas sunt odio voluptas, autem rem dolorem aspernatur sed incidunt cum. Autem ea a debitis unde necessitatibus.',
             price,
-            author: '6490c32b85562e92539192cc'
+            author: '6490c32b85562e92539192cc',
+            geometry: {
+                type: 'Point',
+                coordinates: [cities[random1000].longitude, cities[random1000].latitude]
+            }
         })
         await camp.save();
     }
