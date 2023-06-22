@@ -14,6 +14,8 @@ const ExpressError = require('./utils/ExpressError');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const User = require('./models/user.js');
+const mongoSanitize = require('express-mongo-sanitize');
+const helmet = require('helmet');
 
 const Campground = require('./models/campground');
 const Review = require('./models/review.js');
@@ -38,8 +40,13 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(mongoSanitize({
+    replaceWith: '_'
+}));
+app.use(helmet({ contentSecurityPolicy: false }));
 
 const sessionConfig = {
+    name: 'sesh',
     secret: 'LOLsecret',
     resave: false,
     saveUninitialized: true,
