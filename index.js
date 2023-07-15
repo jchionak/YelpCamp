@@ -6,9 +6,10 @@ const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
 const ejsMate = require('ejs-mate');
-const session = require('express-session')
+const session = require('express-session');
 const flash = require('connect-flash');
 const methodOverride = require('method-override');
+const MongoStore = require('connect-mongo');
 const { campgroundSchema, reviewSchema } = require('./schemas.js');
 const ExpressError = require('./utils/ExpressError');
 const passport = require('passport');
@@ -24,7 +25,8 @@ const campgroundRoutes = require('./routes/campgrounds.js');
 const reviewRoutes = require('./routes/reviews.js');
 const userRoutes = require('./routes/users.js');
 
-mongoose.connect('mongodb://127.0.0.1:27017/yelpCamp');
+const dbUrl = process.env.DB_URL || 'mongodb://127.0.0.1:27017/yelpCamp'
+mongoose.connect(dbUrl);
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
@@ -45,13 +47,29 @@ app.use(mongoSanitize({
 }));
 app.use(helmet({ contentSecurityPolicy: false }));
 
+const secret = process.env.SECRET || 'LOLsecret'
+
+const store = MongoStore.create({
+    mongoUrl: dbUrl,
+    touchAfter: 24 * 60 * 60,
+    crypto: {
+        secret
+    }
+});
+
+store.on('error', function (e) {
+    console.log('SESSION STORE ERROR', e);
+})
+
 const sessionConfig = {
-    name: 'sesh',
-    secret: 'LOLsecret',
+    store,
+    name: 'session',
+    secret,
     resave: false,
     saveUninitialized: true,
     cookie: {
         httpOnly: true,
+        // secure: true,
         expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
         maxAge: 1000 * 60 * 60 * 24 * 7
     }
@@ -93,6 +111,7 @@ app.use((err, req, res, next) => {
     res.status(statusCode).render('error', { err, statusCode });
 })
 
-app.listen(8080, () => {
+const port = process.env.PORT || 8080
+app.listen(port, () => {
     console.log('Listening on port 8080!')
 })
